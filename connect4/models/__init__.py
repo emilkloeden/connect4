@@ -33,8 +33,12 @@ class Player:
     value: CellValue
     game: Game
 
+    def __init__(self, value, game) -> None:
+        self.game = game
+        self.value = value
+
     def place(self, col_index):
-        self.game.place(col_index, self.value)
+        self.game.grid.place(col_index, self.value)
 
 
 class Grid:
@@ -42,6 +46,7 @@ class Grid:
     game: Game
 
     def __init__(self, game: Game, columns: list[Column] | None = None):
+        self.game = game
         if columns is None:
             self.columns = [Column(index=i) for i in range(7)]
         else:

@@ -1,19 +1,17 @@
-from connect4.models import CellValue, Grid
+from connect4.models import CellValue, Game, Grid
 
 
 def main():
-    grid = Grid()
-    grid.place(0, CellValue.X)
-    grid.place(0, CellValue.X)
-    grid.place(0, CellValue.X)
-    grid.place(0, CellValue.X)
-    grid.place(0, CellValue.X)
-    grid.place(0, CellValue.X)
-    grid.place(0, CellValue.X)  # noqa: F821
-    # grid.place(0, CellValue.X)
-    # grid.place(0, CellValue.O)
-    # grid.place(1, CellValue.O)
-    print(grid)
+    game = Game()
+    grid = game.grid
+    p1, p2 = game.players
+    p1.place(0)
+
+    p2.place(0)
+
+    p1.place(0)
+
+    p2.place(2)
 
 
 if __name__ == "__main__":

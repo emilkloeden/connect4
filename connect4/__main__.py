@@ -1,5 +1,5 @@
 import argparse
-from connect4.models import Game
+from connect4.models.game import Game
 from connect4.models.events import Play
 
 
@@ -7,6 +7,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("player", choices=("O", "X"))
     parser.add_argument("column", type=int_range(0, 6))
+    parser.add_argument("--debug", action="store_true")
     return parser.parse_args()
 
 
@@ -36,7 +37,8 @@ def main():
     play = Play(args.player, args.column)
     game.events.append(play)
     game.play_events()
-    game.save_events()
+    if not args.debug:
+        game.save_events()
     print(grid)
 
 

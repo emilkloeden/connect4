@@ -8,6 +8,7 @@ def parse_args():
     parser.add_argument("player", choices=("O", "X"))
     parser.add_argument("column", type=int_range(0, 6))
     parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--show", action="store_true")
     return parser.parse_args()
 
 
@@ -34,6 +35,7 @@ def main():
     grid = game.grid
 
     game.load_events()
+
     play = Play(args.player, args.column)
     game.events.append(play)
     game.play_events()

@@ -14,6 +14,7 @@ class Game:
     players: tuple[Player, Player]
     events: list[Event]
     event_log: Path = Path("connect4.game")
+    NUMBER_TO_WIN: int = 4
 
     def __init__(self) -> None:
         self.state = GameState.O_TURN
@@ -31,47 +32,58 @@ class Game:
         except FileNotFoundError:
             self.events = []
 
-    # TODO
     def has_player_won_horizontally(self, player: Player) -> bool:
-        # number_to_win = 4
-        # grid = self.grid
-        # matrix = grid.as_matrix
-        # for i in range(grid.NUM_COLUMNS):
-        #     for j in range(grid.NUM_ROWS):
-        #         print(i, j)
-        return False
+        matrix = self.grid.as_matrix
+        n = len(matrix)
+        m = len(matrix[0])
+        k = self.NUMBER_TO_WIN
 
-    # TODO
+        slices = get_horizontal_slices(matrix, n, m, k)
+
+        return self.player_has_a_winning_slice(player, slices)
+
     def has_player_won_vertically(self, player: Player) -> bool:
-        number_to_win = 4
-        grid = self.grid
-        matrix = grid.as_matrix
-        for column in matrix:
-            for i in range(grid.NUM_ROWS - number_to_win):
-                if all(
-                    map(
-                        lambda cell: cell == player.value.value,
-                        column[i : i + number_to_win],
-                    )
-                ):
-                    return True
+        matrix = self.grid.as_matrix
+        n = len(matrix)
+        m = len(matrix[0])
+        k = self.NUMBER_TO_WIN
 
-        return False
+        slices = get_vertical_slices(matrix, n, m, k)
 
-    # TODO
-    def has_player_won_top_left_to_bottom_right(self, player: Player) -> bool:
-        return False
+        return self.player_has_a_winning_slice(player, slices)
 
-    # TODO
-    def has_player_won_top_right_to_bottom_left(self, player: Player) -> bool:
-        return False
+    def has_player_won_bottom_right_to_top_left(self, player: Player) -> bool:
+        matrix = self.grid.as_matrix
+        n = len(matrix)
+        m = len(matrix[0])
+        k = self.NUMBER_TO_WIN
+
+        slices = get_bottom_right_to_top_left_slices(matrix, n, m, k)
+
+        return self.player_has_a_winning_slice(player, slices)
+
+    def has_player_won_bottom_left_to_top_right(self, player: Player) -> bool:
+        matrix = self.grid.as_matrix
+        n = len(matrix)
+        m = len(matrix[0])
+        k = self.NUMBER_TO_WIN
+
+        slices = get_bottom_left_to_top_right_slices(matrix, n, m, k)
+
+        return self.player_has_a_winning_slice(player, slices)
+
+    def player_has_a_winning_slice(self, player, slices):
+        return any(
+            all(map(lambda cell: cell and cell == player.value.value, slice))
+            for slice in slices
+        )
 
     def has_player_won(self, player: Player) -> bool:
         return (
             self.has_player_won_horizontally(player)
             or self.has_player_won_vertically(player)
-            or self.has_player_won_top_left_to_bottom_right(player)
-            or self.has_player_won_top_right_to_bottom_left(player)
+            or self.has_player_won_bottom_right_to_top_left(player)
+            or self.has_player_won_bottom_left_to_top_right(player)
         )
 
     def has_x_won(self) -> bool:
@@ -218,3 +230,35 @@ class Player:
 
     def place(self, col_index):
         self.game.grid.place(col_index, self.value)
+
+
+def get_horizontal_slices(matrix, n, m, k):
+    slices = []
+    for j in range(m):
+        for i in range(n - k + 1):
+            slices.append([matrix[i + x][j] for x in range(k)])
+    return slices
+
+
+def get_vertical_slices(matrix, n, m, k):
+    slices = []
+    for i in range(n):
+        for j in range(m - k + 1):
+            slices.append(matrix[i][j : j + k])
+    return slices
+
+
+def get_bottom_right_to_top_left_slices(matrix, n, m, k):
+    slices = []
+    for i in range(n - k + 1):
+        for j in range(k - 1, m):
+            slices.append([matrix[i + x][j - x] for x in range(k)])
+    return slices
+
+
+def get_bottom_left_to_top_right_slices(matrix, n, m, k):
+    slices = []
+    for i in range(n - k + 1):
+        for j in range(m - k + 1):
+            slices.append([matrix[i + x][j + x] for x in range(k)])
+    return slices
